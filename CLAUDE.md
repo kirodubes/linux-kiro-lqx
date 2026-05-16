@@ -78,6 +78,11 @@ zcat /proc/config.gz | grep CONFIG_PREEMPT=
 cat /sys/kernel/mm/transparent_hugepage/enabled
 ```
 
+## Reference links
+
+- Chaotic-AUR linux-lqx PKGBUILD (upstream reference for comparison): https://gitlab.com/chaotic-aur/pkgbuilds/-/blob/main/linux-lqx/PKGBUILD
+- Liquorix patch source: https://github.com/damentz/liquorix-package (branch `7.0/master`, path `linux-liquorix/debian/patches/zen/`)
+
 ## Current state
 
 Initial setup. PKGBUILD at 7.0.7-lqx1, pkgrel 1. Run `./build-kernel.sh` to do first build.
