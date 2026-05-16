@@ -83,6 +83,15 @@ cat /sys/kernel/mm/transparent_hugepage/enabled
 - Chaotic-AUR linux-lqx PKGBUILD (upstream reference for comparison): https://gitlab.com/chaotic-aur/pkgbuilds/-/blob/main/linux-lqx/PKGBUILD
 - Liquorix patch source: https://github.com/damentz/liquorix-package (branch `7.0/master`, path `linux-liquorix/debian/patches/zen/`)
 
+## Session end
+
+When the user signals work is done for the day:
+
+1. Update CHANGELOG.md
+2. Update CLAUDE.md current state / next steps
+3. Sync best_practices.md: `cp ~/.claude/best_practices.md /home/erik/KIRO/linux-kiro-lqx/best_practices.md`
+4. Stage and commit: `git add CHANGELOG.md CLAUDE.md best_practices.md` then push
+
 ## Current state
 
 PKGBUILD at 7.0.7-lqx1, pkgrel 1. Full documentation suite in place (README, SETUP, QUICKSTART, BUILD_SCRIPT_README, COMPARISON, ONBOARDING). First build completed 2026-05-15. Next: run `./build-kernel.sh` for subsequent builds or when updating to a new kernel version.
