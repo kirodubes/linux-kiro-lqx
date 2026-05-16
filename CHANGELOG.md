@@ -1,5 +1,26 @@
 # Changelog — linux-kiro-lqx
 
+## 2026.05.16
+
+### What Changed
+Full documentation suite written and published. PKGBUILD compared with the Chaotic-AUR upstream linux-lqx. Shareable onboarding template created for anyone wanting to build their own custom kernel with Claude.
+
+### Technical Details
+- Fetched Chaotic-AUR linux-lqx PKGBUILD from GitLab for comparison
+- Key differences documented: our PKGBUILD hardcodes native CPU + mandatory modprobed-db + PDS-only, adds LTO support and sub-packages (nvidia-open, ZFS, r8125, debug), uses ZSTD_CLEVEL=19 and module signing; Chaotic's is generic, scheduler-selectable, pulls patches dynamically from the liquorix-package tarball
+- CLAUDE.md updated with Reference links section (Chaotic PKGBUILD URL + Liquorix patch source)
+- ONBOARDING.md written as a generic template for anyone starting a custom Arch kernel project; shared via Claude Code onboarding link: https://claude.ai/claude-code/onboard/WWvIE2tARwuU
+- GitHub push initially failed: `erikdubois` SSH key not added as collaborator on `kirodubes/linux-kiro-lqx`; resolved by adding collaborator access
+
+### Files Modified
+- README.md (new)
+- SETUP.md (new)
+- QUICKSTART.md (new)
+- BUILD_SCRIPT_README.md (new)
+- COMPARISON.md (new)
+- ONBOARDING.md (new)
+- CLAUDE.md (updated — added Reference links section)
+
 ## 2026.05.15
 
 ### What Changed

@@ -85,4 +85,4 @@ cat /sys/kernel/mm/transparent_hugepage/enabled
 
 ## Current state
 
-Initial setup. PKGBUILD at 7.0.7-lqx1, pkgrel 1. Run `./build-kernel.sh` to do first build.
+PKGBUILD at 7.0.7-lqx1, pkgrel 1. Full documentation suite in place (README, SETUP, QUICKSTART, BUILD_SCRIPT_README, COMPARISON, ONBOARDING). First build completed 2026-05-15. Next: run `./build-kernel.sh` for subsequent builds or when updating to a new kernel version.
