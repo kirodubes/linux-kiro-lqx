@@ -1,5 +1,7 @@
 # Custom Arch Linux Kernel — Claude Onboarding Template
 
+> **Load this guide into Claude Code**: https://claude.ai/claude-code/onboard/WWvIE2tARwuU
+
 This is a template CLAUDE.md for anyone building a custom Arch Linux kernel package with Claude Code. Copy the relevant sections into your own project's `CLAUDE.md` and fill in your specifics.
 
 ---

@@ -113,6 +113,7 @@ If you build on different hardware, re-enable relevant options via `nconfig` or 
 - Kernel Source: [kernel.org](https://www.kernel.org/)
 - Liquorix Patchset: [damentz/liquorix-package](https://github.com/damentz/liquorix-package)
 - PDS Scheduler: part of the lqx patchset (Project-C by Alfred Chen)
+- Claude Code Onboarding Guide: https://claude.ai/claude-code/onboard/WWvIE2tARwuU
 
 ## License
 
