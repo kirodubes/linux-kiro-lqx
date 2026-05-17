@@ -1,5 +1,7 @@
 # CLAUDE.md
 
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 ## Project
 
 Custom Arch Linux kernel package (`linux-kiro-lqx`) based on Liquorix/Zen kernel patchset. Built exclusively for this machine (Intel i7-10700K). Uses the PDS (Project-C) alternative scheduler from the Liquorix lqx patch — the key difference from `linux-kiro` which uses BORE.
@@ -28,10 +30,10 @@ Custom Arch Linux kernel package (`linux-kiro-lqx`) based on Liquorix/Zen kernel
 # Direct makepkg
 makepkg -si --skippgpcheck
 
-# Cleanup build artifacts
+# Cleanup build artifacts from repo root (does NOT touch kernels/)
 ./clean.sh
 
-# Stage + status for git
+# Stage + commit + push
 ./up.sh
 ```
 
@@ -45,11 +47,19 @@ Build takes 30–60 min. With modprobed-db active: 30–50% faster.
 - `_use_llvm_lto` — none/thin/full (default: none)
 - `_build_nvidia_open` / `_build_zfs` / `_build_r8125` / `_build_debug` — optional sub-packages
 
-**config** — Liquorix `config-arch-64`, full x86-64 config with PDS/1000Hz/BBR already set. Regenerated each build via `localmodconfig`.
+The `b2sums` array at the bottom is owned by `updpkgsums` — never edit it manually.
+
+**config** — Liquorix `config-arch-64`, the *input* config for each build. Regenerated via `localmodconfig` during `prepare()`.
+
+**config-`<ver>`-`<pkgrel>`-kiro-lqx** — auto-saved snapshot of the post-localmodconfig `.config`. This is output, not input; never edit it.
 
 **v7.0.7-lqx1.patch** — the Liquorix zen patch applied to vanilla kernel. Source: `damentz/liquorix-package` on GitHub, branch `7.0/master`.
 
-**build-kernel.sh** — simple wrapper: checks modprobed.db, optionally enables nconfig, runs updpkgsums, runs makepkg, archives .pkg.tar.zst files into `kernels/<timestamp>/`.
+**build-kernel.sh** — wrapper: refreshes modprobed.db, optionally enables nconfig, runs `updpkgsums`, runs `makepkg`, archives `.pkg.tar.zst` files into `kernels/<timestamp>/`.
+
+**setup.sh** — one-time git remote configuration (sets SSH alias `github.com-edu`). Run once per machine, not on every session.
+
+**up.sh** — recurring git add/commit/push cycle. Calls `setup.sh` first if the remote isn't configured yet.
 
 ## Updating to a new kernel version
 
