@@ -37,7 +37,7 @@ _is_lto_kernel() {
 
 pkgbase="linux-kiro-lqx"
 _major=7.0
-_minor=7
+_minor=9
 _lqxrel=lqx1
 pkgver=${_major}.${_minor}
 pkgrel=1
