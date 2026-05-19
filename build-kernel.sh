@@ -10,6 +10,11 @@ KERNELS_DIR="$SCRIPT_DIR/kernels"
 
 cd "$SCRIPT_DIR"
 
+# ── Clean previous build artifacts ───────────────────────────────────────────
+
+echo "Cleaning src/ and pkg/ from previous build..."
+rm -rf "$SCRIPT_DIR/src" "$SCRIPT_DIR/pkg"
+
 # ── modprobed-db: install if missing, always refresh ─────────────────────────
 
 if ! command -v modprobed-db &>/dev/null; then
