@@ -1,5 +1,25 @@
 # Changelog — linux-kiro-lqx
 
+## 2026.05.19
+
+### What Changed
+Bumped kernel to 7.0.9-lqx1 (upstream released 7.0.9). Cleaned up config: disabled three dead/wrong-arch options flagged by a syscheck audit.
+
+### Technical Details
+- Downloaded `v7.0.9-lqx1.patch` from `damentz/liquorix-package` (7.0/master branch); removed old `v7.0.7-lqx1.patch`
+- PKGBUILD `_minor` updated from 7 → 9; `pkgrel` stays 1 (new upstream minor resets it)
+- `b2sums` recalculated automatically by `updpkgsums` inside `./build-kernel.sh`
+- Config changes (all in `config` input file):
+  - `CONFIG_KVM_AMD=m` / `CONFIG_KVM_AMD_SEV=y` → disabled (machine is Intel i7-10700K, AMD KVM module is dead weight)
+  - `CONFIG_ANDROID_BINDER_IPC_RUST=y` + device string → disabled (no Android containers on this desktop)
+  - `CONFIG_SECURITY_LANDLOCK=y` → disabled (compiled-in but not in LSM boot list, so never active — just noise)
+
+### Files Modified
+- PKGBUILD (_minor: 7 → 9)
+- config (KVM_AMD, Binder, Landlock disabled)
+- v7.0.7-lqx1.patch (removed)
+- v7.0.9-lqx1.patch (added)
+
 ## 2026.05.16
 
 ### What Changed

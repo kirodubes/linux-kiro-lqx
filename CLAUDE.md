@@ -10,7 +10,7 @@ Custom Arch Linux kernel package (`linux-kiro-lqx`) based on Liquorix/Zen kernel
 
 | Setting       | Value              |
 |---------------|--------------------|
-| Source        | vanilla 7.0.7 + lqx1 patch |
+| Source        | vanilla 7.0.9 + lqx1 patch |
 | Scheduler     | PDS (Project-C alt sched) |
 | HZ            | 1000               |
 | Preemption    | full               |
@@ -53,7 +53,7 @@ The `b2sums` array at the bottom is owned by `updpkgsums` — never edit it manu
 
 **config-`<ver>`-`<pkgrel>`-kiro-lqx** — auto-saved snapshot of the post-localmodconfig `.config`. This is output, not input; never edit it.
 
-**v7.0.7-lqx1.patch** — the Liquorix zen patch applied to vanilla kernel. Source: `damentz/liquorix-package` on GitHub, branch `7.0/master`.
+**v7.0.9-lqx1.patch** — the Liquorix zen patch applied to vanilla kernel. Source: `damentz/liquorix-package` on GitHub, branch `7.0/master`.
 
 **build-kernel.sh** — wrapper: refreshes modprobed.db, optionally enables nconfig, runs `updpkgsums`, runs `makepkg`, archives `.pkg.tar.zst` files into `kernels/<timestamp>/`.
 
@@ -81,7 +81,7 @@ The `b2sums` array at the bottom is owned by `updpkgsums` — never edit it manu
 ## Post-build verification
 
 ```bash
-uname -r                                    # expect 7.0.7-kiro-lqx
+uname -r                                    # expect 7.0.9-kiro-lqx
 zcat /proc/config.gz | grep CONFIG_SCHED_PDS
 zcat /proc/config.gz | grep CONFIG_HZ=
 zcat /proc/config.gz | grep CONFIG_PREEMPT=
@@ -104,4 +104,4 @@ When the user signals work is done for the day:
 
 ## Current state
 
-PKGBUILD at 7.0.7-lqx1, pkgrel 1. Full documentation suite in place (README, SETUP, QUICKSTART, BUILD_SCRIPT_README, COMPARISON, ONBOARDING). First build completed 2026-05-15. Next: run `./build-kernel.sh` for subsequent builds or when updating to a new kernel version.
+PKGBUILD at 7.0.9-lqx1, pkgrel 1. Config cleaned up: disabled KVM_AMD, Android Binder (Rust), and Landlock (was compiled-in but inactive). Full documentation suite in place. Next: run `./build-kernel.sh` to build the 7.0.9 kernel.
