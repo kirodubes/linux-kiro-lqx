@@ -55,7 +55,7 @@ The `b2sums` array at the bottom is owned by `updpkgsums` — never edit it manu
 
 **v7.0.9-lqx1.patch** — the Liquorix zen patch applied to vanilla kernel. Source: `damentz/liquorix-package` on GitHub, branch `7.0/master`.
 
-**build-kernel.sh** — wrapper: refreshes modprobed.db, optionally enables nconfig, runs `updpkgsums`, runs `makepkg`, archives `.pkg.tar.zst` files into `kernels/<timestamp>/`.
+**build-kernel.sh** — wrapper: auto-checks GitHub for a newer lqx patch (downloads + updates PKGBUILD if found), refreshes modprobed.db, optionally enables nconfig, runs `updpkgsums`, runs `makepkg`, archives `.pkg.tar.zst` files into `kernels/<timestamp>/`.
 
 **setup.sh** — one-time git remote configuration (sets SSH alias `github.com-edu`). Run once per machine, not on every session.
 
@@ -63,10 +63,13 @@ The `b2sums` array at the bottom is owned by `updpkgsums` — never edit it manu
 
 ## Updating to a new kernel version
 
-1. Download new lqx patch from `linux-liquorix/debian/patches/zen/` in the liquorix-package repo
-2. Copy to this directory, rename to `v<ver>-<lqxrel>.patch`
-3. Update `_minor`, `_lqxrel`, `pkgrel` in PKGBUILD
-4. Run `./build-kernel.sh` (updpkgsums will recalculate automatically)
+**Minor version bump (`_minor` or `_lqxrel` change):** Fully automatic — just run `./build-kernel.sh`. It queries the GitHub API, downloads the new patch, updates PKGBUILD, resets `pkgrel=1`, and removes the old patch before building.
+
+**Major version bump (`_major` change, e.g. 7.0 → 7.1):** Still manual:
+1. Update `_major` in PKGBUILD
+2. Download new lqx patch from `linux-liquorix/debian/patches/zen/` on the new branch (e.g. `7.1/master`)
+3. Copy to this directory, rename to `v<ver>-<lqxrel>.patch`
+4. Run `./build-kernel.sh`
 
 ## Differences from linux-kiro
 
@@ -104,4 +107,4 @@ When the user signals work is done for the day:
 
 ## Current state
 
-PKGBUILD at 7.0.9-lqx1, pkgrel 1. Config cleaned up: disabled KVM_AMD, Android Binder (Rust), and Landlock (was compiled-in but inactive). Full documentation suite in place. Next: run `./build-kernel.sh` to build the 7.0.9 kernel.
+PKGBUILD at 7.0.9-lqx1, pkgrel 1. Config cleaned up: disabled KVM_AMD, Android Binder (Rust), and Landlock. `build-kernel.sh` now auto-updates lqx patch version from GitHub on each run. Next: run `./build-kernel.sh` to build the 7.0.9 kernel (or a newer version if one has dropped).

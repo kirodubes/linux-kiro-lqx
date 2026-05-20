@@ -1,5 +1,13 @@
 # Claude Best Practices
 
+## 2026-05-20 (session end — linux-kiro-lqx build automation)
+
+**Tip: Use `python3 -c` with an env var for JSON parsing in bash — avoids a `jq` dependency**
+When a bash script needs to extract values from a JSON API response, embed `python3 -c '...'` and pipe JSON through stdin. Pass context via environment variables (`CUR_MAJOR="$var" python3 -c '...'`) so the inline script can read `os.environ["CUR_MAJOR"]` safely. Python3 is always available (it's a kernel makedepend on Arch); `jq` is not. The inline script can sort by parsed version numbers, validate assumptions, and handle missing keys — all things `grep`/`sed`/`awk` do poorly on nested JSON. Keep it under ~20 lines; extract to a `.py` file if it grows larger.
+
+**Tip: Use a `.desktop` file with `Type=Link` for clickable URL shortcuts on Linux — not `.url`**
+`.url` files are a Windows format and work only in some Linux file managers. The cross-desktop XDG standard is a `.desktop` file: `[Desktop Entry]\nType=Link\nName=Label\nURL=https://...\nIcon=text-html`. Double-clicking it opens the URL in the default browser via `xdg-open`, and it's recognized by Thunar, Nautilus, PCManFM, Dolphin, and every other XDG-compliant file manager. This is the correct format for any "bookmark to a website" shortcut you want to live in a project directory.
+
 ## 2026-05-18 (session end — kiro-iso-next TODO housekeeping)
 
 **Tip: Display any list Claude will be asked to reference by number — use sequential numbers top to bottom, across all sections**
@@ -64,6 +72,14 @@ Instead of writing a separate `sysctl -n key` + compare block for each security 
 
 **Tip: `VBoxManage modifyvm --natpf1` only works when the VM is stopped — use `VBoxManage controlvm natpf1` for live VMs**
 `VBoxManage modifyvm "Name" --natpf1 "rule,tcp,,2022,,22"` requires the VM to be in `poweroff`, `saved`, or `aborted` state — running it against a live VM returns an error. For a running VM, use `VBoxManage controlvm "Name" natpf1 "rule,tcp,,2022,,22"` (no `--` prefix, no `modifyvm`). When scripting VM setup, detect state first with `VBoxManage showvminfo --machinereadable | grep '^VMState='` and dispatch to the correct command. Also: when grepping machinereadable output for an existing NAT rule, match `"rulename,` (name + comma) not `"rulename"` — the format is `natpf1="rulename,tcp,,port,,22"` so the closing quote never follows the name directly.
+
+## 2026-05-19 (session end — kiro-iso deep verification)
+
+**Tip: archiso only creates a directory on the live ISO if at least one file exists in it — use a placeholder file, not an empty directory**
+`mkarchiso` builds the squashfs from the airootfs overlay by copying files. If a directory contains no files, it is silently omitted from the live ISO. For directories that must exist at runtime (e.g. `sshd_config.d/`, `tmpfiles.d/`) but whose contents vary between live and installed environments, keep a real file in the source even if you wish the directory were empty. If you need the directory without any functional config, use a benign placeholder (a `.keep` file or a minimal stub). Deleting the last file in such a directory will cause "directory not found" errors at runtime — confirmed with `sshd_config.d/` in kiro-iso.
+
+**Tip: After a `git add --all` commit, always check `git show --stat HEAD` to verify no deleted files were silently re-added**
+`up.sh`-style scripts that do `git add --all` before committing will re-add any file that was deleted from git history but still exists on disk — for example if a build process, editor, or another terminal recreated it. A file you deliberately removed via `git rm` can silently reappear in the next `up.sh` run if the physical file was restored. After any `git add --all` commit that was meant to include a deletion, run `git show --stat HEAD` and scan for `| N +++` lines on files that should have been removed. The pattern is especially treacherous when builds run concurrently with git operations.
 
 ## 2026-05-19 (session end — Startup-HQ)
 
@@ -1349,3 +1365,19 @@ A hardcoded `echo "myscript version 1.2.3"` goes stale the moment the package is
 
 **Tip: `mandb` runs on a daily systemd timer, not at boot — run it manually after deploying new man pages**
 `man-db.timer` fires once daily with up to 12 hours of random delay. A freshly copied `.8` file won't appear in `man kiro<Tab>` completion until the timer fires or you run `sudo mandb` yourself. Any deploy script that installs man pages to `/usr/share/man/` should call `mandb` as its last step, or the user will hit a confusing "no completions" gap that fixes itself overnight.
+
+## 2026-05-19 (ATT bluetooth + deferred-tab bug sweep)
+
+**Tip: In GTK4 lazy-built pages, always call refresh() immediately after connecting it to the map signal**
+`_defer_tab(container, build_fn)` builds the GUI on the container's first `map` signal. By the time `build_fn` runs and connects `container.connect("map", _refresh)`, that `map` event has already fired — so `_refresh` is never called on first load, leaving buttons permanently greyed out until the user navigates away and back. Fix: call `_refresh(self, fn)` (or the equivalent named callback) once at the end of every `gui()` function that uses this pattern, in addition to connecting it to `map`. One extra line; the `map` connection still fires on subsequent visits.
+
+**Tip: Back up any file a third-party tool will overwrite before the tool runs, not after**
+Tools like `hblock`, `reflector`, or `grub-mkconfig` overwrite system files completely, discarding the user's customisations. The backup must happen before the tool runs — checking for an existing backup first so re-runs are idempotent: `if not os.path.exists("/etc/hosts-bak"): shutil.copy2("/etc/hosts", "/etc/hosts-bak")`. On removal, restore the backup then delete it. Doing the backup after the tool runs defeats the purpose: the original is already gone. Applies to any ATT feature that delegates a write to an external binary.
+
+## 2026-05-20 (ATT bug scan session)
+
+**Tip: Use Python for bulk multi-file text insertions — sed single-quote nesting is a trap**
+When you need to insert a line containing single quotes into 14 files (e.g. `trap 'error "..."' ERR`), sed quoting becomes a multi-escape nightmare: `sed -i '/pattern/a trap '"'"'error...'`. A 10-line Python script is cleaner, auditable, and handles any character without escaping: open each file, walk lines, append the target string after the match line, write back. The Python approach also lets you verify the insertion with `print(fname)` before touching the filesystem. Rule: if the string to insert contains single quotes, use Python.
+
+**Tip: When fixing a class of bug, immediately scan the whole codebase for the same pattern before moving on**
+Finding one `time.sleep()` after `process.wait()` or one missing `daemon=True` means the pattern likely exists elsewhere — it was copy-pasted or written during the same period with the same misunderstanding. Before closing the fix, run a targeted grep across all files: `grep -rn "time.sleep\|threading.Thread(" --include="*.py"`. If the first scan turns up 3 instances and you only fix 1, the other 2 will resurface as separate bugs later. Spend 2 minutes grepping; save 2 future sessions.

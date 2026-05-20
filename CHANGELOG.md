@@ -1,5 +1,23 @@
 # Changelog — linux-kiro-lqx
 
+## 2026.05.20
+
+### What Changed
+`build-kernel.sh` now auto-detects and downloads newer lqx patch versions from GitHub before building — no more manual patch download, PKGBUILD editing, or old-patch cleanup. Added `liquorix.desktop` as a clickable URL shortcut to liquorix.net.
+
+### Technical Details
+- At startup, `build-kernel.sh` reads `_major`/`_minor`/`_lqxrel` from PKGBUILD and queries the GitHub API (`damentz/liquorix-package`, branch `${_major}/master`, path `linux-liquorix/debian/patches/zen/`)
+- A `python3 -c` inline script (using env var `CUR_MAJOR` for context) parses the JSON response, finds `.patch` files, extracts version via regex `(\d+\.\d+)\.(\d+)[.\-](lqx\d+)`, and picks the highest matching version
+- If newer: downloads the patch via `curl -fL`, updates `_minor`/`_lqxrel`/`pkgrel=1` in PKGBUILD via `sed -i`, removes the old patch file — all before `updpkgsums` runs
+- Falls through silently (with a warning) if GitHub is unreachable; won't touch PKGBUILD if already at latest
+- Major version bumps (e.g., 7.0 → 7.1) are still manual — they require a different liquorix branch and a new kernel base tarball
+- `liquorix.url` (Windows-format) was replaced with `liquorix.desktop` using XDG `Type=Link` — the standard for clickable URL shortcuts on Linux, recognized by Thunar, Nautilus, PCManFM, and other XDG-compliant file managers
+
+### Files Modified
+- `build-kernel.sh` (added auto version-check and update block)
+- `liquorix.desktop` (new — replaces liquorix.url)
+- `liquorix.url` (removed)
+
 ## 2026.05.19
 
 ### What Changed
