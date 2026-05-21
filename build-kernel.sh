@@ -158,7 +158,9 @@ updpkgsums
 # ── Build ─────────────────────────────────────────────────────────────────────
 
 echo "Starting kernel build..."
+_build_start=$SECONDS
 makepkg -s --skippgpcheck
+_build_seconds=$((SECONDS - _build_start))
 
 # ── Archive packages ──────────────────────────────────────────────────────────
 
@@ -179,18 +181,45 @@ for pkg in "${packages[@]}"; do
     mv -v "$pkg" "$DEST/"
 done
 
+# ── Build stats ──────────────────────────────────────────────────────────────
+
+_hist_pkgver=$(grep -Po 'pkgver=\K[0-9.]+' PKGBUILD)
+_hist_pkgrel=$(grep -Po 'pkgrel=\K[0-9]+' PKGBUILD)
+_hist_lqxrel=$(grep -Po '_lqxrel=\K\S+' PKGBUILD)
+_hist_snap="$SCRIPT_DIR/config-${_hist_pkgver}-${_hist_pkgrel}-kiro-lqx"
+if [[ -f "$_hist_snap" ]]; then
+    _hist_modules=$(grep -c '^CONFIG_[A-Z0-9_]*=m$' "$_hist_snap" || echo 0)
+else
+    _hist_modules=0
+fi
+_hist_size_bytes=$(stat -c%s "$DEST"/*.pkg.tar.zst 2>/dev/null | awk '{s+=$1} END {print s+0}')
+_hist_size_mb=$(awk "BEGIN {printf \"%.1f\", ${_hist_size_bytes}/1024/1024}")
+_hist_duration=$(printf '%dm%02ds' $((_build_seconds/60)) $((_build_seconds%60)))
+
 cat > "$DEST/build-info.md" <<EOF
 # Build info
 
-- Date    : $(date)
-- pkgver  : $(grep -Po 'pkgver=\K[0-9.]+' PKGBUILD)
-- pkgrel  : $(grep -Po 'pkgrel=\K[0-9]+' PKGBUILD)
-- lqxrel  : $(grep -Po '_lqxrel=\K\S+' PKGBUILD)
-- CPU     : native
-- Sched   : PDS (Liquorix)
-- HZ      : 1000
-- Preempt : full
+- Date     : $(date)
+- pkgver   : ${_hist_pkgver}
+- pkgrel   : ${_hist_pkgrel}
+- lqxrel   : ${_hist_lqxrel}
+- Duration : ${_hist_duration} (${_build_seconds}s)
+- Modules  : ${_hist_modules}
+- Size     : ${_hist_size_mb} MB
+- CPU      : native
+- Sched    : PDS (Liquorix)
+- HZ       : 1000
+- Preempt  : full
 EOF
+
+# ── Append to build-history.csv ──────────────────────────────────────────────
+
+HISTORY_CSV="$KERNELS_DIR/build-history.csv"
+if [[ ! -f "$HISTORY_CSV" ]]; then
+    echo "timestamp,pkgver,pkgrel,lqxrel,build_seconds,modules,size_mb" > "$HISTORY_CSV"
+fi
+echo "$(date -Iseconds),${_hist_pkgver},${_hist_pkgrel},${_hist_lqxrel},${_build_seconds},${_hist_modules},${_hist_size_mb}" >> "$HISTORY_CSV"
+echo "build-history.csv: appended ${_hist_pkgver}-${_hist_pkgrel} (${_hist_duration}, ${_hist_modules} modules, ${_hist_size_mb} MB)"
 
 echo ""
 echo "Packages stored in: $DEST"
