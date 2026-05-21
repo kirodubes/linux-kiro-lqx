@@ -64,6 +64,37 @@ if m and m.group(1) == cur_major:
                 echo "Removed old patch: $_old_patch"
             fi
             echo "PKGBUILD updated to ${_cur_major}.${_new_minor}-${_new_lqxrel}"
+
+            # Prepend a new section to RELEASE_NOTES.md
+            _release_notes="$SCRIPT_DIR/RELEASE_NOTES.md"
+            if [[ ! -f "$_release_notes" ]]; then
+                cat > "$_release_notes" <<'RN_EOF'
+# Release Notes — linux-kiro-lqx
+
+One section per kernel version bump. Newest at the top. New sections are auto-prepended by `build-kernel.sh` when it detects a new lqx patch on GitHub.
+
+RN_EOF
+            fi
+
+            _new_section="## ${_cur_major}.${_new_minor}-${_new_lqxrel} ($(date +%Y-%m-%d))
+
+Bumped from ${_cur_major}.${_cur_minor}-${_cur_lqxrel} → ${_cur_major}.${_new_minor}-${_new_lqxrel}.
+
+- **Patch source**: ${_new_url}
+- **Scheduler**: PDS (unchanged)
+- **lqx changelog**: https://github.com/damentz/liquorix-package/commits/${_cur_major}/master
+"
+
+            RELEASE_NOTES_PATH="$_release_notes" NEW_SECTION="$_new_section" python3 - <<'PY'
+import os, pathlib
+path = pathlib.Path(os.environ["RELEASE_NOTES_PATH"])
+new_section = os.environ["NEW_SECTION"]
+lines = path.read_text().splitlines(keepends=True)
+insert_at = next((i for i, l in enumerate(lines) if l.startswith("## ")), len(lines))
+out = "".join(lines[:insert_at]) + new_section + "\n" + "".join(lines[insert_at:])
+path.write_text(out)
+PY
+            echo "RELEASE_NOTES.md updated with ${_cur_major}.${_new_minor}-${_new_lqxrel} section"
         else
             echo "Already at latest: ${_cur_major}.${_cur_minor}-${_cur_lqxrel}"
         fi
