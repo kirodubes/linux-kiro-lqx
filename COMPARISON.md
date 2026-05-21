@@ -7,12 +7,12 @@ Maintainer: Piotr Gorski (Chaotic-AUR)
 
 ## 1. Package Identity
 
-| | linux-kiro-lqx (ours) | linux-lqx (Chaotic) |
-|---|---|---|
-| pkgbase | `linux-kiro-lqx` | `linux-lqx` |
-| Build host | `kiro` | `archlinux` |
-| URL | erikdubois/linux-kiro-lqx | liquorix.net |
-| Target | This machine only | Generic Arch |
+|            | linux-kiro-lqx (ours)     | linux-lqx (Chaotic) |
+|------------|---------------------------|---------------------|
+| pkgbase    | `linux-kiro-lqx`          | `linux-lqx`         |
+| Build host | `kiro`                    | `archlinux`         |
+| URL        | erikdubois/linux-kiro-lqx | liquorix.net        |
+| Target     | This machine only         | Generic Arch        |
 
 ---
 
@@ -76,14 +76,14 @@ Maintainer: Piotr Gorski (Chaotic-AUR)
 
 ## 9. Sub-packages
 
-| Sub-package | linux-kiro-lqx | linux-lqx (Chaotic) |
-|---|---|---|
-| headers | yes | yes |
-| nvidia-open | optional (`_build_nvidia_open`) | no |
-| ZFS | optional (`_build_zfs`) | no |
-| r8125 | optional (`_build_r8125`) | no |
-| debug (vmlinux) | optional (`_build_debug`) | no |
-| docs (htmldocs) | no | optional (`_htmldocs_enable`) |
+| Sub-package     | linux-kiro-lqx                  | linux-lqx (Chaotic)           |
+|-----------------|---------------------------------|-------------------------------|
+| headers         | yes                             | yes                           |
+| nvidia-open     | optional (`_build_nvidia_open`) | no                            |
+| ZFS             | optional (`_build_zfs`)         | no                            |
+| r8125           | optional (`_build_r8125`)       | no                            |
+| debug (vmlinux) | optional (`_build_debug`)       | no                            |
+| docs (htmldocs) | no                              | optional (`_htmldocs_enable`) |
 
 ---
 
@@ -123,18 +123,18 @@ Chaotic also applies these. Ours matches.
 
 ## Summary
 
-| Area | Chaotic linux-lqx | linux-kiro-lqx |
-|------|-------------------|----------------|
-| Patch source | tarball series (auto-updates) | single pre-merged patch |
-| Version detection | dynamic from tarball | hardcoded |
-| Config source | from tarball (always in sync) | local file (manual refresh) |
-| Scheduler | selectable (bmq/pds/none) | PDS only |
-| CPU optimization | generic | native (non-portable) |
-| localmodcfg | optional | mandatory |
-| LTO | none | optional (thin/full) |
-| Extra packages | docs | nvidia-open, ZFS, r8125, debug |
-| Module compression | standard | ZSTD level 19 |
-| Module signing | no | yes |
-| Portability | any Arch machine | this machine only |
+| Area               | Chaotic linux-lqx             | linux-kiro-lqx                 |
+|--------------------|-------------------------------|--------------------------------|
+| Patch source       | tarball series (auto-updates) | single pre-merged patch        |
+| Version detection  | dynamic from tarball          | hardcoded                      |
+| Config source      | from tarball (always in sync) | local file (manual refresh)    |
+| Scheduler          | selectable (bmq/pds/none)     | PDS only                       |
+| CPU optimization   | generic                       | native (non-portable)          |
+| localmodcfg        | optional                      | mandatory                      |
+| LTO                | none                          | optional (thin/full)           |
+| Extra packages     | docs                          | nvidia-open, ZFS, r8125, debug |
+| Module compression | standard                      | ZSTD level 19                  |
+| Module signing     | no                            | yes                            |
+| Portability        | any Arch machine              | this machine only              |
 
 **Ours is more opinionated**: native CPU, mandatory modprobed-db, PDS-only, but adds LTO and sub-package support that Chaotic doesn't have. Chaotic is more general-purpose and follows upstream liquorix-package more closely.

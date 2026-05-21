@@ -13,14 +13,14 @@ A custom Arch Linux kernel package built exclusively for this machine.
 
 ## Files
 
-| File | Purpose |
-|------|---------|
-| `PKGBUILD` | Arch build script |
-| `config` | Liquorix `config-arch-64`, full x86-64 config |
-| `v7.0.7-lqx1.patch` | Liquorix zen patch applied to vanilla kernel |
-| `build-kernel.sh` | Build wrapper — handles modprobed-db, checksums, archiving |
-| `clean.sh` | Cleans build artifacts |
-| `up.sh` | Git stage + status helper |
+| File                | Purpose                                                    |
+|---------------------|------------------------------------------------------------|
+| `PKGBUILD`          | Arch build script                                          |
+| `config`            | Liquorix `config-arch-64`, full x86-64 config              |
+| `v7.0.7-lqx1.patch` | Liquorix zen patch applied to vanilla kernel               |
+| `build-kernel.sh`   | Build wrapper — handles modprobed-db, checksums, archiving |
+| `clean.sh`          | Cleans build artifacts                                     |
+| `up.sh`             | Git stage + status helper                                  |
 
 ---
 
@@ -74,13 +74,13 @@ cat /sys/kernel/mm/transparent_hugepage/enabled   # expect: madvise
 
 ## Key Differences from linux-kiro
 
-| Feature | linux-kiro | linux-kiro-lqx |
-|---------|-----------|----------------|
-| Source | CachyOS pre-patched tarball | Vanilla kernel + lqx patch |
-| Scheduler | BORE | PDS (Project-C) |
-| Config base | CachyOS config | Liquorix config-arch-64 |
-| Presets | Gaming / Desktop | None (single fixed profile) |
-| THP | always | madvise |
+| Feature     | linux-kiro                  | linux-kiro-lqx              |
+|-------------|-----------------------------|-----------------------------|
+| Source      | CachyOS pre-patched tarball | Vanilla kernel + lqx patch  |
+| Scheduler   | BORE                        | PDS (Project-C)             |
+| Config base | CachyOS config              | Liquorix config-arch-64     |
+| Presets     | Gaming / Desktop            | None (single fixed profile) |
+| THP         | always                      | madvise                     |
 
 ---
 

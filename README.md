@@ -52,18 +52,18 @@ makepkg -si --skippgpcheck
 
 This kernel has a single fixed profile — no gaming/desktop toggle. All settings are permanent:
 
-| Setting    | Value                       |
-|------------|-----------------------------|
-| Source     | Vanilla 7.0.7 + lqx1 patch  |
-| Scheduler  | PDS (Project-C)             |
-| HZ         | 1000                        |
-| Preemption | Full                        |
-| Tickless   | Full (NO_HZ_FULL)           |
-| CPU opt    | Native (always)             |
-| TCP        | BBR                         |
-| THP        | madvise                     |
-| O3         | Yes                         |
-| Localmod   | Always (modprobed-db)       |
+| Setting    | Value                      |
+|------------|----------------------------|
+| Source     | Vanilla 7.0.7 + lqx1 patch |
+| Scheduler  | PDS (Project-C)            |
+| HZ         | 1000                       |
+| Preemption | Full                       |
+| Tickless   | Full (NO_HZ_FULL)          |
+| CPU opt    | Native (always)            |
+| TCP        | BBR                        |
+| THP        | madvise                    |
+| O3         | Yes                        |
+| Localmod   | Always (modprobed-db)      |
 
 ## Advanced Build Options
 

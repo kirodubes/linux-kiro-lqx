@@ -121,13 +121,13 @@ Ask Claude to update it after each session. It becomes the project memory — ve
 
 ### Scheduler quick reference
 
-| Scheduler | Good for | Source |
-|-----------|----------|--------|
-| BORE | Gaming, low-latency desktop | CachyOS / linux-kiro |
-| PDS | Low-latency desktop | Liquorix lqx patchset |
-| EEVDF | Balanced desktop/server | Vanilla kernel (default) |
-| BMQ | Alternative desktop | Liquorix lqx patchset |
-| CFS | Generic / server | Vanilla kernel (legacy) |
+| Scheduler | Good for                    | Source                   |
+|-----------|-----------------------------|--------------------------|
+| BORE      | Gaming, low-latency desktop | CachyOS / linux-kiro     |
+| PDS       | Low-latency desktop         | Liquorix lqx patchset    |
+| EEVDF     | Balanced desktop/server     | Vanilla kernel (default) |
+| BMQ       | Alternative desktop         | Liquorix lqx patchset    |
+| CFS       | Generic / server            | Vanilla kernel (legacy)  |
 
 ### Common PKGBUILD patterns
 

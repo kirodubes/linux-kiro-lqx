@@ -8,18 +8,18 @@ Custom Arch Linux kernel package (`linux-kiro-lqx`) based on Liquorix/Zen kernel
 
 ## Kernel profile (fixed — no presets)
 
-| Setting       | Value              |
-|---------------|--------------------|
-| Source        | vanilla 7.0.9 + lqx1 patch |
-| Scheduler     | PDS (Project-C alt sched) |
-| HZ            | 1000               |
-| Preemption    | full               |
-| Tickless      | full (NO_HZ_FULL)  |
-| CPU opt       | native (always)    |
-| TCP default   | BBR                |
-| THP           | madvise            |
-| O3            | yes (in base config) |
-| Localmod      | always (modprobed-db required) |
+| Setting     | Value                          |
+|-------------|--------------------------------|
+| Source      | vanilla 7.0.9 + lqx1 patch     |
+| Scheduler   | PDS (Project-C alt sched)      |
+| HZ          | 1000                           |
+| Preemption  | full                           |
+| Tickless    | full (NO_HZ_FULL)              |
+| CPU opt     | native (always)                |
+| TCP default | BBR                            |
+| THP         | madvise                        |
+| O3          | yes (in base config)           |
+| Localmod    | always (modprobed-db required) |
 
 ## Build commands
 
@@ -73,13 +73,13 @@ The `b2sums` array at the bottom is owned by `updpkgsums` — never edit it manu
 
 ## Differences from linux-kiro
 
-| Feature | linux-kiro | linux-kiro-lqx |
-|---------|-----------|----------------|
-| Source | CachyOS pre-patched tarball | Vanilla kernel + lqx patch |
-| Scheduler | BORE | PDS (Project-C) |
-| Config base | CachyOS config | Liquorix config-arch-64 |
-| Presets | Gaming / Desktop | None (single profile) |
-| THP | always | madvise |
+| Feature     | linux-kiro                  | linux-kiro-lqx             |
+|-------------|-----------------------------|----------------------------|
+| Source      | CachyOS pre-patched tarball | Vanilla kernel + lqx patch |
+| Scheduler   | BORE                        | PDS (Project-C)            |
+| Config base | CachyOS config              | Liquorix config-arch-64    |
+| Presets     | Gaming / Desktop            | None (single profile)      |
+| THP         | always                      | madvise                    |
 
 ## Post-build verification
 
