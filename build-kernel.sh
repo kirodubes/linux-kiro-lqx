@@ -103,6 +103,124 @@ PY
     fi
 fi
 
+# ── Liquorix config-arch-64 drift report ────────────────────────────────────
+
+# Re-read minor/lqxrel from PKGBUILD so we report against the just-updated values
+# (the auto-update block above may have bumped them after the initial read).
+_drift_minor=$(grep -Po '^_minor=\K\S+' PKGBUILD)
+_drift_lqxrel=$(grep -Po '^_lqxrel=\K\S+' PKGBUILD)
+_drift_ver="${_cur_major}.${_drift_minor}-${_drift_lqxrel}"
+_drift_url="https://raw.githubusercontent.com/damentz/liquorix-package/${_cur_major}/master/linux-liquorix/debian/config/kernelarch-x86/config-arch-64"
+_drift_tmp=$(mktemp)
+
+echo "Fetching upstream config-arch-64 for drift report..."
+if ! curl -sfL --max-time 30 "$_drift_url" -o "$_drift_tmp"; then
+    echo "Warning: Could not fetch upstream config-arch-64 — skipping drift report"
+    rm -f "$_drift_tmp"
+else
+    _drift_file="$SCRIPT_DIR/CONFIG_DRIFT.md"
+    _drift_section=$(LOCAL="$SCRIPT_DIR/config" UPSTREAM="$_drift_tmp" \
+                     URL="$_drift_url" VER="$_drift_ver" \
+                     python3 - <<'PY'
+import os, datetime
+
+def parse(path):
+    out = {}
+    with open(path) as f:
+        for line in f:
+            s = line.strip()
+            if not s:
+                continue
+            if s.startswith("# CONFIG_") and s.endswith(" is not set"):
+                key = s[2:].rsplit(" is not set", 1)[0]
+                out[key] = "n"
+            elif s.startswith("CONFIG_") and "=" in s:
+                key, _, val = s.partition("=")
+                out[key] = val
+    return out
+
+local = parse(os.environ["LOCAL"])
+upstream = parse(os.environ["UPSTREAM"])
+
+overrides, added, only_local = [], [], []
+for k in sorted(set(local) | set(upstream)):
+    lv, uv = local.get(k), upstream.get(k)
+    if lv is None:
+        added.append((k, uv))
+    elif uv is None:
+        only_local.append((k, lv))
+    elif lv != uv:
+        overrides.append((k, uv, lv))
+
+def md_table(rows, headers):
+    widths = [max(len(h), *(len(r[i]) for r in rows)) for i, h in enumerate(headers)]
+    pad_row = lambda r: "| " + " | ".join(c.ljust(w) for c, w in zip(r, widths)) + " |"
+    sep = "|" + "|".join("-" * (w + 2) for w in widths) + "|"
+    return "\n".join([pad_row(headers), sep] + [pad_row(r) for r in rows])
+
+date = datetime.date.today().isoformat()
+ver = os.environ["VER"]
+url = os.environ["URL"]
+
+lines = [
+    f"## {date} — {ver}",
+    "",
+    f"- Upstream: <{url}>",
+    f"- Counts: **{len(overrides)} overrides** · {len(added)} new upstream · {len(only_local)} only-local",
+    "",
+]
+if overrides:
+    lines += [
+        "### A. Options we override (upstream changed value, our config keeps different)",
+        "",
+        md_table(overrides, ["Option", "Upstream", "Local"]),
+        "",
+    ]
+if added:
+    lines += ["### B. Added by Liquorix (not in our config)", ""]
+    lines += [f"- `{k}={v}`" for k, v in added]
+    lines.append("")
+if only_local:
+    lines += ["### C. Only in our config (Liquorix does not set)", ""]
+    lines += [f"- `{k}={v}`" for k, v in only_local]
+    lines.append("")
+if not (overrides or added or only_local):
+    lines += ["No drift — local config matches upstream byte-for-byte.", ""]
+
+print("\n".join(lines))
+PY
+)
+
+    if [[ ! -f "$_drift_file" ]]; then
+        cat > "$_drift_file" <<'DRIFT_EOF'
+# Liquorix Config Drift — linux-kiro-lqx
+
+Per-build comparison of local [`config`](./config) vs upstream `linux-liquorix/debian/config/kernelarch-x86/config-arch-64` on the matching `<major>/master` branch. Newest section first. Auto-prepended by [`build-kernel.sh`](./build-kernel.sh).
+
+Three buckets:
+
+- **A. Overrides** — options where upstream changed value but our pinned config keeps a different one. **These matter most**: a Liquorix upstream change is silently being undone by our config.
+- **B. Added by Liquorix** — options upstream now sets that we don't have at all (likely new since our last sync).
+- **C. Only in our config** — options we set that upstream doesn't (intentional Kiro customizations, or stale entries to prune).
+
+DRIFT_EOF
+    fi
+
+    DRIFT_PATH="$_drift_file" NEW_SECTION="$_drift_section" python3 - <<'PY'
+import os, pathlib
+path = pathlib.Path(os.environ["DRIFT_PATH"])
+new = os.environ["NEW_SECTION"]
+lines = path.read_text().splitlines(keepends=True)
+insert_at = next((i for i, l in enumerate(lines) if l.startswith("## ")), len(lines))
+out = "".join(lines[:insert_at]) + new + "\n" + "".join(lines[insert_at:])
+path.write_text(out)
+PY
+
+    _drift_summary=$(awk -F'Counts: ' '/Counts:/ {gsub(/\*\*/, "", $2); print $2; exit}' <<< "$_drift_section")
+    echo "CONFIG_DRIFT.md updated for ${_drift_ver}: ${_drift_summary}"
+    rm -f "$_drift_tmp"
+fi
+
 # ── Clean previous build artifacts ───────────────────────────────────────────
 
 echo "Cleaning src/ and pkg/ from previous build..."

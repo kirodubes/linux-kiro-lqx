@@ -1,5 +1,24 @@
 # Changelog — linux-kiro-lqx
 
+## 2026.05.22
+
+### What Changed
+`build-kernel.sh` now compares the local `config` against the upstream Liquorix `config-arch-64` on every build invocation and writes a per-build drift report to a new `CONFIG_DRIFT.md`. Prevents silent override of upstream config changes by our pinned local copy — the original concern from the backlog.
+
+### Technical Details
+- Runs unconditionally per build (not just on version bump): a single ~250 KB curl from `damentz/liquorix-package/${_cur_major}/master/linux-liquorix/debian/config/kernelarch-x86/config-arch-64`. If GitHub is unreachable, prints a warning and continues — drift report is best-effort, never blocks the build.
+- Inline Python helper parses both files into `key → value` dicts (treating `# CONFIG_X is not set` as `=n` for comparability) and classifies into three buckets: **A. overrides** (upstream changed, we differ), **B. added by Liquorix** (only upstream), **C. only in our config** (only local).
+- Output: dated section prepended to `CONFIG_DRIFT.md` (file auto-created with explanatory front-matter on first run, newest section first — same prepend pattern as `RELEASE_NOTES.md`).
+- Tables follow the HQ md-table-alignment convention (cells padded with trailing spaces so pipes line up in raw source).
+- Baseline run on `7.0.9-lqx1` flagged the four intentional Erik divergences (KVM_AMD=n, KVM_AMD_SEV=n, ANDROID_BINDER_IPC_RUST=n, SECURITY_LANDLOCK=n) plus one related new upstream addition (`CONFIG_ANDROID_BINDER_DEVICES`). `0 only-local` confirms our config is a clean subset.
+- Re-reads `_minor`/`_lqxrel` from PKGBUILD after the version-check block so the report shows the just-updated version, not the pre-bump one.
+
+### Files Modified
+- [build-kernel.sh](./build-kernel.sh) — new drift-report block between version-check and clean stages
+- [CONFIG_DRIFT.md](./CONFIG_DRIFT.md) — new file (baseline section auto-generated)
+- [TODO.md](./TODO.md) — backlog item closed
+- [CHANGELOG.md](./CHANGELOG.md) — this entry
+
 ## 2026.05.20
 
 ### What Changed
